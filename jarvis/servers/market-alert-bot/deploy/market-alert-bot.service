@@ -1,0 +1,47 @@
+# ──────────────────────────────────────────────────────────────
+# deploy/market-alert-bot.service — systemd unit file (§10 Stage 6)
+# ──────────────────────────────────────────────────────────────
+# Copy to: /etc/systemd/system/market-alert-bot.service
+# Then:
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable market-alert-bot
+#   sudo systemctl start market-alert-bot
+#
+# View logs:
+#   sudo journalctl -u market-alert-bot -f
+# ──────────────────────────────────────────────────────────────
+
+[Unit]
+Description=24/7 Forex & Global Market News Alert Bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=vengeance
+Group=vengeance
+WorkingDirectory=/home/vengeance/Documents/News/market-alert-bot
+ExecStart=/home/vengeance/Documents/News/market-alert-bot/.venv/bin/python main.py
+Restart=always
+RestartSec=10
+StartLimitBurst=5
+StartLimitIntervalSec=300
+
+# Environment
+EnvironmentFile=/home/vengeance/Documents/News/market-alert-bot/.env
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/vengeance/Documents/News/market-alert-bot/database
+ReadWritePaths=/home/vengeance/Documents/News/market-alert-bot/logs
+ReadWritePaths=/home/vengeance/Documents/News/market-alert-bot/sessions
+PrivateTmp=true
+
+# Resource limits
+MemoryMax=512M
+CPUQuota=50%
+
+[Install]
+WantedBy=multi-user.target

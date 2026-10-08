@@ -1,0 +1,29 @@
+# Market Alert Bot — .gitignore
+
+# Environment / credentials
+.env
+sessions/
+*.session
+
+# Database
+database/*.db
+database/*.db-wal
+database/*.db-shm
+
+# Logs
+logs/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
