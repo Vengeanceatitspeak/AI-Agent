@@ -1,0 +1,12 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "calendar-server"
+version = "0.1.0"
+description = "JARVIS MCP Server: Calendar operations"
+requires-python = ">=3.11"
+dependencies = [
+    "mcp>=1.0,<2.0",
+]

@@ -1,0 +1,68 @@
+# JARVIS Core Configuration
+# See docs/ARCHITECTURE.md for details on each section.
+
+general:
+  name: JARVIS
+  data_dir: "${JARVIS_DATA_DIR:-~/.jarvis/data}"
+  log_level: "${JARVIS_LOG_LEVEL:-INFO}"
+  log_format: console  # json | console
+
+models:
+  # All models use Groq with round-robin key rotation
+  router_model:
+    provider: groq
+    model: qwen/qwen3.8-27b
+    max_tokens: 1024
+    temperature: 0.0
+  reasoning_model:
+    provider: groq
+    model: openai/gpt-oss-120b
+    max_tokens: 8192
+    temperature: 0.3
+  summarizer_model:
+    provider: groq
+    model: qwen/qwen3.8-27b
+    max_tokens: 2048
+    temperature: 0.1
+
+providers:
+  groq:
+    api_key: "${GROQ_API_KEYS}"
+    max_retries: 3
+    timeout_seconds: 120
+  ollama:
+    base_url: "${OLLAMA_BASE_URL:-http://localhost:11434}"
+    timeout_seconds: 300
+
+agent:
+  max_iterations: 12
+  wall_clock_timeout_seconds: 300
+  max_parallel_tool_calls: 5
+  stream: true
+
+session:
+  token_budget: 100000  # per-model override via models.*.max_context
+  conversation_window: 20  # keep last N turns verbatim
+  summarize_after: 15  # summarize turns older than this
+
+memory:
+  enabled: true
+  store: sqlite
+  embedding_model: "all-MiniLM-L6-v2"  # sentence-transformers model name
+  max_recall_items: 10
+  auto_extract: true  # extract facts at end of session
+
+api:
+  enabled: true
+  host: "127.0.0.1"
+  port: 8741
+  token: "${JARVIS_API_TOKEN}"
+
+voice:
+  enabled: true
+  mode: push_to_talk  # push_to_talk | wake_word
+  wake_word_model: "hey_jarvis"
+  stt_model: "small"
+  tts_voice: "elevenlabs"
+
+triggers: []

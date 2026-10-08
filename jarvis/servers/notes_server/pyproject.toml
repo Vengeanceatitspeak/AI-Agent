@@ -1,0 +1,12 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "notes-server"
+version = "0.1.0"
+description = "JARVIS MCP Server: Note management"
+requires-python = ">=3.11"
+dependencies = [
+    "mcp>=1.0,<2.0",
+]

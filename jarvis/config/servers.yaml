@@ -1,0 +1,114 @@
+# MCP Server Registry
+# Each entry defines an MCP server that JARVIS can connect to.
+# Add/remove entries here to add/remove capabilities — no Core code changes needed.
+# Run `jarvis servers reload` after editing, or JARVIS will auto-detect changes.
+
+servers:
+  - name: fs
+    enabled: true
+    transport: stdio
+    command: python
+    args: ["-m", "fs_server"]
+    cwd: servers/fs_server
+    env:
+      FS_ROOT: "${JARVIS_WORKSPACE}"
+    timeout_seconds: 30
+    startup_timeout_seconds: 15
+    restart: on_failure
+    toolsets: [files, core]
+    risk_default: L2
+    tool_overrides:
+      read_file:    { risk: L1 }
+      list_dir:     { risk: L1 }
+      search_files: { risk: L1 }
+      write_file:   { risk: L2, confirm: false }
+      move_path:    { risk: L2, confirm: true }
+      delete_path:  { risk: L3, confirm: true }
+
+  - name: notes
+    enabled: true
+    transport: stdio
+    command: python
+    args: ["-m", "notes_server"]
+    cwd: servers/notes_server
+    env:
+      NOTES_DIR: "${JARVIS_WORKSPACE}/notes"
+    timeout_seconds: 30
+    startup_timeout_seconds: 15
+    restart: on_failure
+    toolsets: [notes, core]
+    risk_default: L1
+    tool_overrides:
+      create_note:  { risk: L2 }
+      append_note:  { risk: L2 }
+      search_notes: { risk: L1 }
+      list_notes:   { risk: L1 }
+      get_note:     { risk: L1 }
+
+  - name: web
+    enabled: false  # enable when ready (Phase 3)
+    transport: stdio
+    command: python
+    args: ["-m", "web_server"]
+    cwd: servers/web_server
+    timeout_seconds: 60
+    startup_timeout_seconds: 15
+    restart: on_failure
+    toolsets: [web]
+    risk_default: L1
+    tool_overrides:
+      search:     { risk: L1 }
+      fetch_page: { risk: L1 }
+
+  - name: system
+    enabled: false  # enable when ready (Phase 4)
+    transport: stdio
+    command: python
+    args: ["-m", "system_server"]
+    cwd: servers/system_server
+    timeout_seconds: 30
+    startup_timeout_seconds: 10
+    restart: on_failure
+    toolsets: [system, core]
+    risk_default: L1
+    tool_overrides:
+      get_time:        { risk: L0 }
+      get_system_info: { risk: L0 }
+      open_app:        { risk: L2, confirm: true }
+      clipboard_get:   { risk: L1 }
+      clipboard_set:   { risk: L2 }
+
+  - name: calendar
+    enabled: false  # enable when ready (Phase 4)
+    transport: stdio
+    command: python
+    args: ["-m", "calendar_server"]
+    cwd: servers/calendar_server
+    env:
+      CALENDAR_FILE: "${JARVIS_WORKSPACE}/calendar.ics"
+    timeout_seconds: 30
+    startup_timeout_seconds: 10
+    restart: on_failure
+    toolsets: [calendar]
+    risk_default: L1
+    tool_overrides:
+      list_events:     { risk: L1 }
+      find_free_slots: { risk: L1 }
+      create_event:    { risk: L2, confirm: true }
+
+  - name: market
+    enabled: false  # enable when ready (Phase 4)
+    transport: stdio
+    command: python
+    args: ["-m", "market_data_server"]
+    cwd: servers/market_data_server
+    timeout_seconds: 60
+    startup_timeout_seconds: 15
+    restart: on_failure
+    toolsets: [finance]
+    risk_default: L1
+    tool_overrides:
+      get_quote:        { risk: L1 }
+      get_historical:   { risk: L1 }
+      list_watchlist:   { risk: L1 }
+      add_to_watchlist: { risk: L2 }

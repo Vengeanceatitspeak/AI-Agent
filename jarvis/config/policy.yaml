@@ -1,0 +1,105 @@
+# JARVIS Policy Configuration
+# Controls risk tiers, safety rules, and limits for all tool calls.
+
+risk_tiers:
+  L0:
+    description: "Public/harmless read (time, math, public web search)"
+    action: allow
+    audit: false
+  L1:
+    description: "Personal data read (notes, calendar, files in workspace)"
+    action: allow
+    audit: true
+  L2:
+    description: "Reversible write / device control (create note, add event)"
+    action: allow
+    audit: true
+    confirm: false  # optional; can be overridden per-tool
+  L3:
+    description: "Sensitive or hard-to-reverse (delete files, send message, run shell)"
+    action: confirm
+    audit: true
+    confirm: true
+  L4:
+    description: "Critical / financial / irreversible (execute trades, move money)"
+    action: deny
+    audit: true
+    confirm: true
+    cooldown_seconds: 30
+
+defaults:
+  unknown_tool_tier: L3  # unknown = cautious
+  unknown_server_tier: L3
+
+# Argument-level rules
+argument_rules:
+  path_sandboxing:
+    enabled: true
+    allowed_roots:
+      - "${JARVIS_WORKSPACE}"
+    resolve_symlinks: true
+    deny_patterns:
+      - "../../"
+      - "/etc/"
+      - "/root/"
+      - "/proc/"
+      - "/sys/"
+
+  url_rules:
+    enabled: true
+    block_private_ips: true
+    block_internal_ranges:
+      - "10.0.0.0/8"
+      - "172.16.0.0/12"
+      - "192.168.0.0/16"
+      - "127.0.0.0/8"
+      - "169.254.0.0/16"
+
+  shell_rules:
+    enabled: true
+    allow_patterns: []  # empty = deny all shell commands in v1
+    deny_patterns:
+      - "rm -rf"
+      - "sudo"
+      - "chmod"
+      - "mkfs"
+      - "dd "
+      - "> /dev/"
+
+# Rate limits
+rate_limits:
+  global:
+    calls_per_minute: 60
+    max_concurrent: 10
+  per_server:
+    default:
+      calls_per_minute: 30
+      max_concurrent: 5
+
+# Financial limits (for future finance servers)
+financial_limits:
+  enabled: false
+  paper_trading_default: true
+  max_position_size: 0
+  max_daily_loss: 0
+  instrument_allow_list: []
+  trading_hours_only: true
+
+# Taint tracking
+taint:
+  enabled: true
+  untrusted_sources:
+    - web_server
+    - "*.fetch_page"
+    - "*.search"
+  escalate_on_taint: true  # L2+ after taint → CONFIRM
+
+# Proactive run restrictions
+proactive:
+  max_tier: L1  # proactive runs limited to L0-L1
+  allow_notifications: true
+  quiet_hours:
+    enabled: false
+    start: "22:00"
+    end: "07:00"
+    timezone: "local"

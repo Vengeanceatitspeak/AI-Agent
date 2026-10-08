@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "api/index.py" },
+    { "src": "/ws/(.*)", "dest": "api/index.py" },
+    { "src": "/(.*)", "dest": "api/index.py" }
+  ],
+  "env": {
+    "GROQ_API_KEYS": "@groq-api-keys",
+    "ELEVENLABS_API_KEY": "@elevenlabs-api-key",
+    "ELEVENLABS_VOICE_ID": "EXAVITQu4vr4xnSDxMaL",
+    "GITHUB_TOKEN": "@github-token",
+    "GITHUB_REPO": "@github-repo"
+  }
+}
